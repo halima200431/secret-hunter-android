@@ -1,6 +1,35 @@
-﻿node_modules
+﻿# Node / frontend
+frontend/node_modules
+frontend/dist
+node_modules
 dist
+
+# Python / backend
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.venv
+venv
+env
+
+# Environment
 .env
 .env.local
+
+# Runtime folders
+uploads/*
+extracted/*
+reports/*
+logs/*
+
+# Keep empty folders
+!uploads/.gitkeep
+!extracted/.gitkeep
+!reports/.gitkeep
+!logs/.gitkeep
+
+# System / IDE
 .DS_Store
 .vscode
+.idea
