@@ -37,6 +37,7 @@ def _save_uploaded_apk(file_storage):
         raise ValueError("Seuls les fichiers .apk sont acceptés.")
 
     analysis_id = str(uuid.uuid4())
+
     upload_dir = Path(current_app.config["UPLOAD_FOLDER"]) / analysis_id
     upload_dir.mkdir(parents=True, exist_ok=True)
 
@@ -50,11 +51,36 @@ def _save_uploaded_apk(file_storage):
     return analysis_id, apk_path, original_name
 
 
+def _normalize_endpoint_result(endpoint_result):
+    """
+    Certains endpoint scanners retournent directement une liste.
+    D'autres retournent un dictionnaire avec une clé 'findings'.
+    Cette fonction normalise le résultat en liste propre.
+    """
+
+    if isinstance(endpoint_result, dict):
+        findings = endpoint_result.get("findings", [])
+
+        if isinstance(findings, list):
+            return findings
+
+        return []
+
+    if isinstance(endpoint_result, list):
+        return endpoint_result
+
+    return []
+
+
 def _run_analysis_pipeline(analysis_id: str, apk_path: str, apk_name: str):
     """
-    Pipeline principal.
-    Il est compatible avec les fichiers des collègues.
-    Si leurs modules ne sont pas encore remplis, il retourne un résultat partiel propre.
+    Pipeline principal :
+    1. Extraction APK
+    2. Scan secrets
+    3. Scan endpoints
+    4. Scoring
+    5. Analyse IA
+    6. Génération rapport
     """
 
     apk_path = Path(apk_path)
@@ -65,18 +91,32 @@ def _run_analysis_pipeline(analysis_id: str, apk_path: str, apk_name: str):
     endpoints = []
     extraction_errors = []
 
+    print("\n========== START ANALYSIS PIPELINE ==========")
+    print("ANALYSIS ID =", analysis_id)
+    print("APK PATH =", apk_path)
+    print("APK NAME =", apk_name)
+
     try:
         from backend.services.apk_service import extract_apk
+
+        print("[1] Calling apk_service.extract_apk()...")
 
         extraction_result = extract_apk(
             apk_path=str(apk_path),
             analysis_id=analysis_id,
         )
 
+        print("[1] EXTRACTION RESULT =", extraction_result)
+
         extracted_path = extraction_result.get("extracted_path")
         files_analyzed = extraction_result.get("files_count", 0)
 
+        print("[1] EXTRACTED PATH =", extracted_path)
+        print("[1] FILES ANALYZED =", files_analyzed)
+
     except Exception as error:
+        print("[ERROR] APK SERVICE ERROR =", str(error))
+
         extraction_errors.append(
             {
                 "module": "apk_service",
@@ -88,8 +128,22 @@ def _run_analysis_pipeline(analysis_id: str, apk_path: str, apk_name: str):
         try:
             from backend.scanners.secret_scanner import scan_secrets
 
-            secrets = scan_secrets(extracted_path)
+            print("[2] Calling secret_scanner.scan_secrets()...")
+            print("[2] SECRET SCAN PATH =", extracted_path)
+
+            secret_result = scan_secrets(extracted_path)
+
+            if isinstance(secret_result, list):
+                secrets = secret_result
+            else:
+                secrets = []
+
+            print("[2] SECRETS FOUND =", len(secrets))
+            print("[2] SECRETS SAMPLE =", secrets[:3])
+
         except Exception as error:
+            print("[ERROR] SECRET SCANNER ERROR =", str(error))
+
             extraction_errors.append(
                 {
                     "module": "secret_scanner",
@@ -100,8 +154,19 @@ def _run_analysis_pipeline(analysis_id: str, apk_path: str, apk_name: str):
         try:
             from backend.scanners.endpoint_scanner import scan_endpoints
 
-            endpoints = scan_endpoints(extracted_path)
+            print("[3] Calling endpoint_scanner.scan_endpoints()...")
+            print("[3] ENDPOINT SCAN PATH =", extracted_path)
+
+            endpoint_result = scan_endpoints(extracted_path)
+
+            endpoints = _normalize_endpoint_result(endpoint_result)
+
+            print("[3] ENDPOINTS FOUND =", len(endpoints))
+            print("[3] ENDPOINTS SAMPLE =", endpoints[:3])
+
         except Exception as error:
+            print("[ERROR] ENDPOINT SCANNER ERROR =", str(error))
+
             extraction_errors.append(
                 {
                     "module": "endpoint_scanner",
@@ -109,14 +174,75 @@ def _run_analysis_pipeline(analysis_id: str, apk_path: str, apk_name: str):
                 }
             )
 
-    scored_result = apply_risk_scoring(
-        apk_name=apk_name,
-        files_analyzed=files_analyzed,
-        secrets=secrets,
-        endpoints=endpoints,
-    )
+    else:
+        print("[ERROR] No extracted_path returned. Scan skipped.")
 
-    ai_result = analyze_results_with_ai(scored_result)
+        extraction_errors.append(
+            {
+                "module": "pipeline",
+                "message": "Aucun extracted_path retourné. Le scan secrets/endpoints n’a pas été exécuté.",
+            }
+        )
+
+    try:
+        print("[4] Calling risk scoring...")
+
+        scored_result = apply_risk_scoring(
+            apk_name=apk_name,
+            files_analyzed=files_analyzed,
+            secrets=secrets,
+            endpoints=endpoints,
+        )
+
+        print("[4] SCORED RESULT =", scored_result)
+
+    except Exception as error:
+        print("[ERROR] RISK SCORING ERROR =", str(error))
+
+        extraction_errors.append(
+            {
+                "module": "risk_scoring",
+                "message": str(error),
+            }
+        )
+
+        scored_result = {
+            "apkName": apk_name,
+            "globalRisk": "Low",
+            "globalScore": 0,
+            "filesAnalyzed": files_analyzed,
+            "secretsCount": len(secrets),
+            "endpointsCount": len(endpoints),
+            "criticalFindings": 0,
+            "secrets": secrets,
+            "endpoints": endpoints,
+            "riskDistribution": [
+                {"name": "Faible", "value": 0},
+                {"name": "Moyen", "value": 0},
+                {"name": "Élevé", "value": 0},
+                {"name": "Critique", "value": 0},
+            ],
+        }
+
+    try:
+        print("[5] Calling AI analyzer...")
+
+        ai_result = analyze_results_with_ai(scored_result)
+
+    except Exception as error:
+        print("[ERROR] AI ANALYZER ERROR =", str(error))
+
+        extraction_errors.append(
+            {
+                "module": "ai_analyzer",
+                "message": str(error),
+            }
+        )
+
+        ai_result = {
+            "aiSummary": "L’analyse IA n’a pas pu être générée.",
+            "recommendations": [],
+        }
 
     final_result = {
         **scored_result,
@@ -127,12 +253,32 @@ def _run_analysis_pipeline(analysis_id: str, apk_path: str, apk_name: str):
         "errors": extraction_errors,
     }
 
-    report_paths = generate_reports(
-        analysis_result=final_result,
-        analysis_id=analysis_id,
-    )
+    try:
+        print("[6] Calling report generator...")
 
-    final_result["reports"] = report_paths
+        report_paths = generate_reports(
+            analysis_result=final_result,
+            analysis_id=analysis_id,
+        )
+
+        final_result["reports"] = report_paths
+
+    except Exception as error:
+        print("[ERROR] REPORT GENERATOR ERROR =", str(error))
+
+        extraction_errors.append(
+            {
+                "module": "report_generator",
+                "message": str(error),
+            }
+        )
+
+        final_result["status"] = "partial_success"
+        final_result["errors"] = extraction_errors
+        final_result["reports"] = {}
+
+    print("[7] FINAL RESULT =", final_result)
+    print("========== END ANALYSIS PIPELINE ==========\n")
 
     return final_result
 
@@ -184,7 +330,9 @@ def analyze_apk():
             }
         ), 400
 
-    except Exception:
+    except Exception as error:
+        print("[ERROR] UPLOAD ERROR =", str(error))
+
         return jsonify(
             {
                 "status": "error",

@@ -96,11 +96,57 @@ def calculate_endpoint_score(endpoint: Dict[str, Any]) -> int:
     return max(0, min(100, score))
 
 
-def enrich_findings_with_risk(findings: List[Dict[str, Any]], finding_type: str) -> List[Dict[str, Any]]:
+def enrich_findings_with_risk(findings, finding_type):
+    """
+    Ajoute un score et un niveau de risque à chaque résultat.
+
+    Cette fonction accepte deux formats :
+    1. un dictionnaire déjà structuré ;
+    2. une simple chaîne de caractères retournée par un scanner.
+    """
+
     enriched = []
 
     for finding in findings or []:
-        item = dict(finding)
+
+        # Cas normal : le scanner retourne déjà un dictionnaire
+        if isinstance(finding, dict):
+            item = dict(finding)
+
+        # Cas endpoint retourné comme simple string
+        elif isinstance(finding, str) and finding_type == "endpoint":
+            item = {
+                "url": finding,
+                "type": "Endpoint",
+                "protocol": (
+                    "HTTPS"
+                    if finding.lower().startswith("https://")
+                    else "HTTP"
+                    if finding.lower().startswith("http://")
+                    else "Unknown"
+                ),
+                "file": "unknown",
+                "line": None,
+                "note": "Endpoint détecté sous forme de chaîne simple."
+            }
+
+        # Cas secret retourné comme simple string
+        elif isinstance(finding, str) and finding_type == "secret":
+            item = {
+                "type": "Secret",
+                "maskedValue": (
+                    finding[:8] + "********"
+                    if len(finding) > 8
+                    else "********"
+                ),
+                "file": "unknown",
+                "line": None,
+                "context": "Secret détecté sous forme de chaîne simple."
+            }
+
+        # Cas tuple ou liste : on ignore proprement pour éviter le crash
+        else:
+            continue
 
         if finding_type == "secret":
             score = calculate_secret_score(item)
