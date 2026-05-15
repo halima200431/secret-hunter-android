@@ -1,4 +1,4 @@
-﻿import mockAnalysisResult from "../data/mockAnalysisResult";
+﻿import { getAnalysisResult } from "../utils/analysisResultStore";
 
 function Badge({ risk }) {
   const color =
@@ -12,7 +12,7 @@ function Badge({ risk }) {
 }
 
 export default function Endpoints() {
-  const data = mockAnalysisResult.endpoints;
+  const data = getAnalysisResult().endpoints || [];
 
   return (
     <div className="space-y-6">

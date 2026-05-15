@@ -1,5 +1,5 @@
 ﻿import { AlertTriangle, FileSearch, KeyRound, Network } from "lucide-react";
-import mockAnalysisResult from "../data/mockAnalysisResult";
+import { getAnalysisResult } from "../utils/analysisResultStore";
 
 function Card({ title, value, icon: Icon }) {
   return (
@@ -16,7 +16,7 @@ function Card({ title, value, icon: Icon }) {
 }
 
 export default function Dashboard() {
-  const data = mockAnalysisResult;
+  const data = getAnalysisResult();
   const apkName = sessionStorage.getItem("apkName") || data.apkName;
 
   return (

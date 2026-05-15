@@ -1,5 +1,5 @@
 ﻿import { Brain, CheckCircle2 } from "lucide-react";
-import mockAnalysisResult from "../data/mockAnalysisResult";
+import { getAnalysisResult } from "../utils/analysisResultStore";
 
 export default function AIAnalysis() {
   const data = mockAnalysisResult;

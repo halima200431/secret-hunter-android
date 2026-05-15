@@ -1,8 +1,8 @@
 ﻿import { Download, FileText } from "lucide-react";
-import mockAnalysisResult from "../data/mockAnalysisResult";
+import { getAnalysisResult } from "../utils/analysisResultStore";
 
 export default function Report() {
-  const data = mockAnalysisResult;
+  const data = getAnalysisResult();
 
   const downloadJson = () => {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });

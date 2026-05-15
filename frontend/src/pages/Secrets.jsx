@@ -12,7 +12,7 @@ function Badge({ risk }) {
 }
 
 export default function Secrets() {
-  const data = mockAnalysisResult.secrets;
+  const data = getAnalysisResult().secrets || [];
 
   return (
     <div className="space-y-6">
