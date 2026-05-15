@@ -1,0 +1,102 @@
+{
+  "allowed_extensions": [
+    ".java",
+    ".kt",
+    ".smali",
+    ".xml",
+    ".json",
+    ".properties",
+    ".yml",
+    ".yaml",
+    ".txt",
+    ".html",
+    ".js",
+    ".gradle",
+    ".cfg",
+    ".conf"
+  ],
+  "ignored_directories": [
+    ".git",
+    "__pycache__",
+    "node_modules",
+    "build",
+    "dist",
+    ".idea",
+    ".vscode"
+  ],
+  "max_file_size_mb": 5,
+  "url_patterns": [
+    "\\b(?:https?|wss?)://[^\\s\"'<>\\)\\]\\}\\,;]+"
+  ],
+  "ip_patterns": [
+    "\\b(?:(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(?::\\d{1,5})?\\b"
+  ],
+  "domain_patterns": [
+    "\\b(?:[a-zA-Z0-9-]+\\.)+(?:com|net|org|io|ma|app|dev|cloud|co|info|biz|me|ai|tech|site|online|xyz)\\b"
+  ],
+  "api_path_patterns": [
+    "[\"'`]((?:/(?:api|v\\d+|auth|login|logout|register|user|users|admin|token|debug|password|reset|payment|upload|download|profile|session|verify|otp|account|client|customer|order|private)[^\"'`\\s<>]*)+)[\"'`]"
+  ],
+  "sensitive_keywords": [
+    "login",
+    "auth",
+    "token",
+    "admin",
+    "password",
+    "passwd",
+    "pwd",
+    "secret",
+    "debug",
+    "payment",
+    "private",
+    "session",
+    "otp",
+    "verify",
+    "reset",
+    "upload",
+    "download",
+    "profile",
+    "account",
+    "apikey",
+    "api_key"
+  ],
+ 
+"high_risk_keywords": [
+  "login",
+  "auth",
+  "admin",
+  "debug",
+  "token",
+  "password",
+  "passwd",
+  "pwd",
+  "secret",
+  "payment",
+  "private",
+  "otp",
+  "reset"
+],
+
+  "false_positive_domains": [
+    "schemas.android.com",
+    "developer.android.com",
+    "example.com",
+    "example.org",
+    "example.net",
+    "localhost",
+    "127.0.0.1",
+    "0.0.0.0"
+  ],
+  "cloud_domains": [
+    "firebaseio.com",
+    "googleapis.com",
+    "amazonaws.com",
+    "azurewebsites.net",
+    "cloudfront.net",
+    "herokuapp.com",
+    "render.com",
+    "vercel.app",
+    "netlify.app",
+    "ngrok.io"
+  ]
+}

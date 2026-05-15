@@ -9,16 +9,6 @@ except ImportError:
     CORS = None
 
 from backend.api.routes_analysis import analysis_bp
-from flask import Flask
-
-from api.routes_reports import reports_bp
-
-app = Flask(__name__)
-
-app.register_blueprint(reports_bp)
-
-if __name__ == "__main__":
-    app.run(debug=True)
 
 
 BASE_DIR = Path(__file__).resolve().parent
