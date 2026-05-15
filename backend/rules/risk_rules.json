@@ -1,0 +1,48 @@
+{
+  "thresholds": {
+    "Low": {
+      "min": 0,
+      "max": 30
+    },
+    "Medium": {
+      "min": 31,
+      "max": 60
+    },
+    "High": {
+      "min": 61,
+      "max": 85
+    },
+    "Critical": {
+      "min": 86,
+      "max": 100
+    }
+  },
+  "secret_scores": {
+    "api_key": 80,
+    "firebase_key": 80,
+    "client_secret": 85,
+    "bearer_token": 90,
+    "jwt_token": 90,
+    "password": 95,
+    "private_key": 100
+  },
+  "endpoint_scores": {
+    "https_public_endpoint": 25,
+    "login_endpoint": 60,
+    "firebase_url": 60,
+    "internal_ip": 70,
+    "http_endpoint": 75,
+    "admin_endpoint": 80,
+    "debug_endpoint": 80
+  },
+  "global_score_formula": {
+    "max_score_weight": 0.65,
+    "average_score_weight": 0.35
+  },
+  "security_notes": [
+    "Never display full secrets in reports.",
+    "Mask sensitive values before sending results to the frontend.",
+    "Do not store uploaded APK files permanently unless required.",
+    "Do not expose backend debug mode in production."
+  ]
+}
