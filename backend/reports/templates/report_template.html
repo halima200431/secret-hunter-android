@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport SecretHunter Android</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #222;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+        }
+
+        h1, h2, h3 {
+            color: #1f2937;
+        }
+
+        h1 {
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 12px;
+        }
+
+        .meta {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .card {
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .critical {
+            background: #7f1d1d;
+        }
+
+        .high {
+            background: #dc2626;
+        }
+
+        .medium {
+            background: #f59e0b;
+        }
+
+        .low {
+            background: #16a34a;
+        }
+
+        .total {
+            background: #2563eb;
+        }
+
+        .risk-score {
+            padding: 18px;
+            margin: 20px 0;
+            border-radius: 10px;
+            background: #111827;
+            color: white;
+        }
+
+        .risk-score strong {
+            font-size: 22px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+            font-size: 14px;
+        }
+
+        th {
+            background: #1f2937;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .badge {
+            padding: 5px 9px;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .badge-critical {
+            background: #7f1d1d;
+        }
+
+        .badge-high {
+            background: #dc2626;
+        }
+
+        .badge-medium {
+            background: #f59e0b;
+        }
+
+        .badge-low {
+            background: #16a34a;
+        }
+
+        .code {
+            font-family: Consolas, monospace;
+            background: #f3f4f6;
+            padding: 6px;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+
+        .recommendations {
+            background: #f9fafb;
+            border-left: 4px solid #16a34a;
+            padding: 18px;
+            border-radius: 8px;
+        }
+
+        .recommendations li {
+            margin-bottom: 8px;
+        }
+
+        .footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 13px;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 15px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .container {
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+            }
+
+            table {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>Rapport SecretHunter Android</h1>
+
+    <div class="meta">
+        <p><strong>Nom APK :</strong> {{ report.apk_name }}</p>
+        <p><strong>Date de génération :</strong> {{ report.generated_at }}</p>
+        <p><strong>ID Rapport :</strong> {{ report.report_id }}</p>
+        <p><strong>Module :</strong> Analyse statique réseau, endpoints et configuration Android</p>
+    </div>
+
+    <h2>Résumé global</h2>
+
+    <div class="summary-grid">
+        <div class="card total">
+            Total<br>
+            {{ report.summary.total_findings }}
+        </div>
+
+        <div class="card critical">
+            Critical<br>
+            {{ report.summary.critical }}
+        </div>
+
+        <div class="card high">
+            High<br>
+            {{ report.summary.high }}
+        </div>
+
+        <div class="card medium">
+            Medium<br>
+            {{ report.summary.medium }}
+        </div>
+
+        <div class="card low">
+            Low<br>
+            {{ report.summary.low }}
+        </div>
+    </div>
+
+    <div class="risk-score">
+        <p><strong>Score de risque :</strong> {{ report.risk_score }}/100</p>
+        <p><strong>Niveau global :</strong> {{ report.global_risk_level }}</p>
+    </div>
+
+    <h2>Statistiques réseau</h2>
+
+    <table>
+        <tr>
+            <th>Type</th>
+            <th>Nombre</th>
+        </tr>
+        <tr>
+            <td>URLs détectées</td>
+            <td>{{ report.summary.urls }}</td>
+        </tr>
+        <tr>
+            <td>Adresses IP détectées</td>
+            <td>{{ report.summary.ips }}</td>
+        </tr>
+        <tr>
+            <td>Domaines détectés</td>
+            <td>{{ report.summary.domains }}</td>
+        </tr>
+        <tr>
+            <td>Chemins API détectés</td>
+            <td>{{ report.summary.api_paths }}</td>
+        </tr>
+        <tr>
+            <td>Problèmes AndroidManifest.xml</td>
+            <td>{{ report.summary.manifest_issues }}</td>
+        </tr>
+        <tr>
+            <td>Problèmes network_security_config.xml</td>
+            <td>{{ report.summary.network_config_issues }}</td>
+        </tr>
+    </table>
+
+    <h2>Top 10 des risques</h2>
+
+    {% if report.top_10_risks %}
+    <table>
+        <tr>
+            <th>Gravité</th>
+            <th>Type</th>
+            <th>Valeur</th>
+            <th>Fichier</th>
+            <th>Ligne</th>
+            <th>Risque</th>
+        </tr>
+
+        {% for finding in report.top_10_risks %}
+        <tr>
+            <td>
+                {% if finding.severity == "CRITICAL" %}
+                    <span class="badge badge-critical">CRITICAL</span>
+                {% elif finding.severity == "HIGH" %}
+                    <span class="badge badge-high">HIGH</span>
+                {% elif finding.severity == "MEDIUM" %}
+                    <span class="badge badge-medium">MEDIUM</span>
+                {% else %}
+                    <span class="badge badge-low">LOW</span>
+                {% endif %}
+            </td>
+            <td>{{ finding.type }}</td>
+            <td><div class="code">{{ finding.value }}</div></td>
+            <td>{{ finding.file }}</td>
+            <td>{{ finding.line }}</td>
+            <td>{{ finding.risk }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>Aucun risque détecté.</p>
+    {% endif %}
+
+    <h2>Détails complets des résultats</h2>
+
+    {% if report.findings %}
+    <table>
+        <tr>
+            <th>Source</th>
+            <th>Gravité</th>
+            <th>Classification</th>
+            <th>Type</th>
+            <th>Valeur</th>
+            <th>Fichier</th>
+            <th>Ligne</th>
+            <th>Contexte</th>
+            <th>Recommandation</th>
+        </tr>
+
+        {% for finding in report.findings %}
+        <tr>
+            <td>{{ finding.source_module }}</td>
+            <td>
+                {% if finding.severity == "CRITICAL" %}
+                    <span class="badge badge-critical">CRITICAL</span>
+                {% elif finding.severity == "HIGH" %}
+                    <span class="badge badge-high">HIGH</span>
+                {% elif finding.severity == "MEDIUM" %}
+                    <span class="badge badge-medium">MEDIUM</span>
+                {% else %}
+                    <span class="badge badge-low">LOW</span>
+                {% endif %}
+            </td>
+            <td>{{ finding.classification }}</td>
+            <td>{{ finding.type }}</td>
+            <td><div class="code">{{ finding.value }}</div></td>
+            <td>{{ finding.file }}</td>
+            <td>{{ finding.line }}</td>
+            <td><div class="code">{{ finding.context }}</div></td>
+            <td>{{ finding.recommendation }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>Aucun résultat détecté.</p>
+    {% endif %}
+
+    <h2>Recommandations principales</h2>
+
+    <div class="recommendations">
+        {% if report.recommendations %}
+            <ul>
+                {% for recommendation in report.recommendations %}
+                <li>{{ recommendation }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Aucune recommandation spécifique.</p>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        Rapport généré automatiquement par SecretHunter Android.
+    </div>
+
+</div>
+</body>
+</html>
