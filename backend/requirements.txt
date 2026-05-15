@@ -1,1 +1,7 @@
+<<<<<<< HEAD
 flask>=3.0.0
+=======
+flask
+flask-cors
+werkzeug
+>>>>>>> 883ec27e789dfb099c9b6eb3089537c29989f8e5
