@@ -1,5 +1,5 @@
 ﻿import { NavLink } from "react-router-dom";
-import { Shield, LayoutDashboard, Upload, KeyRound, Network, Brain, FileText, Info } from "lucide-react";
+import { Shield, LayoutDashboard, Upload, KeyRound, Network, Brain, FileText, Info, Smartphone } from "lucide-react";
 
 const items = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -13,15 +13,19 @@ const items = [
 
 export default function Sidebar() {
   return (
-    <aside className="fixed left-0 top-0 hidden h-screen w-64 border-r border-zinc-800 bg-[#111111] lg:block">
-      <div className="border-b border-zinc-800 p-5">
+    <aside className="fixed left-0 top-0 z-20 hidden h-screen w-64 border-r border-slate-200/80 bg-white/82 backdrop-blur-2xl lg:block">
+      <div className="border-b border-slate-200/80 p-5">
         <NavLink to="/" className="flex items-center gap-3">
-          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-2">
-            <Shield className="h-6 w-6 text-red-300" />
+          <div className="relative rounded-2xl border border-blue-200 bg-blue-50 p-2 shadow-sm">
+            <Shield className="h-6 w-6 text-blue-700" />
+            <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-white">SecretHunter</h1>
-            <p className="text-xs text-zinc-500">Android Scanner</p>
+            <h1 className="text-lg font-bold text-slate-950">SecretHunter</h1>
+            <p className="flex items-center gap-1 text-xs text-slate-500">
+              <Smartphone className="h-3 w-3" />
+              Android Security
+            </p>
           </div>
         </NavLink>
       </div>
@@ -36,8 +40,8 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition ${
                   isActive
-                    ? "border border-red-500/30 bg-red-500/10 text-red-200"
-                    : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                    ? "border border-blue-200 bg-blue-50 text-blue-800 shadow-sm"
+                    : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-950"
                 }`
               }
             >

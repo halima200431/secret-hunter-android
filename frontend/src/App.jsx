@@ -15,9 +15,22 @@ import About from "./pages/About";
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-[#171717] text-zinc-100">
+      <div className="theme-light relative min-h-screen overflow-x-hidden text-slate-900">
+        <div className="cyber-background" aria-hidden="true">
+          <div className="cyber-grid" />
+          <div className="cyber-orbits" />
+          <div className="cyber-scan" />
+          <div className="cyber-nodes">
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
         <Sidebar />
-        <div className="lg:ml-64">
+        <div className="relative z-10 lg:ml-64">
           <Navbar />
           <main className="min-h-screen p-4 md:p-6">
             <Routes>
